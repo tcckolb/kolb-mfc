@@ -289,6 +289,11 @@ function readLocal() {
     catch (e) { return []; }
 }
 
+function storageOk() {
+    try { localStorage.setItem("kolbmfc_teste", "1"); localStorage.removeItem("kolbmfc_teste"); return true; }
+    catch (e) { return false; }
+}
+
 function writeLocal(list) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); return true; }
     catch (e) { return false; }
@@ -506,12 +511,14 @@ function listSaved() {
         <li class="border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <p class="font-semibold">${escapeHtml(rec.student.name)} <span class="text-gray-500 font-normal">(${escapeHtml(rec.student.year)})</span></p>
-                <p class="text-sm"><span class="inline-block bg-teal-50 text-teal-800 font-semibold rounded-full px-2 py-0.5 mr-1">${escapeHtml(rec.style)}</span>
+                ${rec.scores ? `<p class="text-sm"><span class="inline-block bg-teal-50 text-teal-800 font-semibold rounded-full px-2 py-0.5 mr-1">${escapeHtml(rec.style)}</span>
                 EC ${rec.scores.EC} · OR ${rec.scores.OR} · CA ${rec.scores.CA} · EA ${rec.scores.EA}</p>
-                <p class="text-xs text-gray-500 mt-1">Questionário em ${dataBR(rec.createdAt.slice(0, 10))} · ${rec.plan ? `plano salvo${rec.plan.reviewDate ? `, revisão em ${dataBR(rec.plan.reviewDate)}` : ""}` : "sem plano ainda"}</p>
+                <p class="text-xs text-gray-500 mt-1">Questionário em ${dataBR(rec.createdAt.slice(0, 10))} · ${rec.plan ? `plano salvo${rec.plan.reviewDate ? `, revisão em ${dataBR(rec.plan.reviewDate)}` : ""}` : "sem plano ainda"}</p>`
+                : `<p class="text-sm"><span class="inline-block bg-orange-50 text-orange-800 font-semibold rounded-full px-2 py-0.5">Questionário pendente</span></p>
+                <p class="text-xs text-gray-500 mt-1">Cadastrado em ${dataBR((rec.createdAt || "").slice(0, 10))}</p>`}
             </div>
             <div class="flex gap-2 shrink-0">
-                <button type="button" class="btn-primary !py-2 !px-4" data-open="${rec.id}">Abrir</button>
+                <button type="button" class="btn-primary !py-2 !px-4" data-open="${rec.id}">${rec.scores ? "Abrir" : "Responder"}</button>
                 <button type="button" class="btn-secondary !py-2 !px-4" data-delete="${rec.id}">Excluir</button>
             </div>
         </li>`).join("") : `<li class="text-gray-500">Nenhum residente salvo neste aparelho ainda.</li>`;
@@ -536,6 +543,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 unit: $("unit-name").value.trim()
             }
         };
+        current.createdAt = current.updatedAt = new Date().toISOString();
+        saveRecord(current);   // o residente fica salvo já no cadastro, com o questionário pendente
         populateQuestions();
         $("error-message").style.display = "none";
         changeView("test-view");
@@ -606,7 +615,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const openId = e.target.dataset.open, delId = e.target.dataset.delete;
         if (openId) {
             const rec = readLocal().find(r => r.id === openId);
-            if (rec) { current = rec; showResult(rec, false); }
+            if (rec && rec.scores) { current = rec; showResult(rec, false); }
+            else if (rec) { current = rec; populateQuestions(); $("error-message").style.display = "none"; changeView("test-view"); }
         }
         if (delId) {
             if (e.target.dataset.confirm !== "1") { e.target.dataset.confirm = "1"; e.target.textContent = "Confirmar"; return; }
@@ -614,6 +624,10 @@ document.addEventListener("DOMContentLoaded", () => {
             listSaved();
         }
     });
+
+    // Pede ao navegador para não apagar os dados salvos quando faltar espaço
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    if (!storageOk()) $("storage-mode").textContent = "Atenção: este navegador está bloqueando o armazenamento (janela anônima ou privacidade restrita). Os residentes não ficarão salvos ao fechar a página.";
 
     initFirebase();
 });

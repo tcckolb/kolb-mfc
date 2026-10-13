@@ -2,7 +2,7 @@
 // Caminhos relativos: funciona na raiz do domínio ou em subpastas,
 // como https://usuario.github.io/kolb-mfc/
 // Ao publicar uma nova versão, aumente o número do cache.
-const CACHE_NAME = "kolb-mfc-v2";
+const CACHE_NAME = "kolb-mfc-v3";
 const ARQUIVOS = [
   "./",
   "./index.html",
@@ -34,9 +34,20 @@ self.addEventListener("fetch", event => {
   const mesmoSite = url.origin === self.location.origin;
   const cdn = CDNS.includes(url.hostname);
   if (!mesmoSite && !cdn) return; // Firebase e outros seguem direto pela rede
+  if (mesmoSite) {
+    // Arquivos do app: busca primeiro na rede (pega sempre a versão nova) e usa o cache sem internet
+    event.respondWith(
+      fetch(req).then(net => {
+        if (net.ok) { const copia = net.clone(); caches.open(CACHE_NAME).then(c => c.put(req, copia)); }
+        return net;
+      }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("./index.html")))
+    );
+    return;
+  }
+  // Bibliotecas externas: cache primeiro
   event.respondWith(
     caches.match(req).then(resp => resp || fetch(req).then(net => {
-      if (cdn && (net.ok || net.type === "opaque")) {
+      if (net.ok || net.type === "opaque") {
         const copia = net.clone();
         caches.open(CACHE_NAME).then(c => c.put(req, copia));
       }
