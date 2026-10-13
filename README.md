@@ -6,6 +6,10 @@ O questionário é autoral, baseado no modelo de aprendizagem experiencial de Ko
 
 Acesse: **https://tcckolb.github.io/kolb-mfc/**
 
+## Código aberto
+
+O Kolb-MFC é o produto técnico de um trabalho de conclusão de curso da Especialização em Preceptoria em Medicina de Família e Comunidade. O código é livre, sob a [licença MIT](LICENSE): qualquer pessoa ou programa de residência pode usar, copiar, adaptar e redistribuir, inclusive o questionário e as recomendações, desde que mantenha o aviso de licença. Para adaptar, faça um fork deste repositório e publique a sua versão no GitHub Pages.
+
 ## Arquivos
 
 ```
@@ -15,6 +19,7 @@ kolb-mfc/
 ├── app.js          toda a lógica em um só arquivo (questionário, cálculo, telas, Firebase opcional)
 ├── manifest.json   instalação como app (PWA)
 ├── sw.js           funcionamento offline (precisa ser um arquivo separado)
+├── LICENSE         licença MIT
 └── images/         ícones 192 e 512 px
 ```
 
