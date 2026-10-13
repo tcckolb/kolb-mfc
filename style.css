@@ -1,0 +1,55 @@
+/* style.css – complementos ao Tailwind */
+body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+.view { display: none; }
+.active-view { display: block; }
+
+.btn-primary, .btn-secondary {
+    font-weight: 700; padding: .75rem 1.5rem; border-radius: .5rem;
+    transition: background-color .2s; width: 100%;
+}
+@media (min-width: 640px) { .btn-primary, .btn-secondary { width: auto; } }
+.btn-primary { background: #0d9488; color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.btn-primary:hover { background: #0f766e; }
+.btn-secondary { background: #e5e7eb; color: #1f2937; }
+.btn-secondary:hover { background: #d1d5db; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .radio-group input:focus-visible + label {
+    outline: 3px solid #14b8a6; outline-offset: 2px;
+}
+
+.field { display: flex; flex-direction: column; gap: .35rem; font-weight: 600; font-size: .95rem; }
+.input { font-weight: 400; border: 1px solid #d1d5db; border-radius: .5rem; padding: .6rem .75rem; background: #fff; width: 100%; }
+
+/* Botões redondos de 1 a 4 */
+.radio-group { display: flex; gap: .5rem; align-items: center; }
+.radio-group label {
+    display: flex; justify-content: center; align-items: center;
+    width: 2.5rem; height: 2.5rem; border: 1px solid #d1d5db; border-radius: 50%;
+    cursor: pointer; transition: all .15s ease-in-out; font-weight: 500; background: #fff;
+}
+.radio-group label:hover { border-color: #0d9488; }
+.radio-group input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.radio-group input[type="radio"]:checked + label { background: #0d9488; color: #fff; border-color: #0d9488; }
+.question.complete { border-color: #99f6e4; background: #f0fdfa; }
+.question.invalid { border-color: #f87171; }
+
+.sticky-progress { position: sticky; top: 0; background: #fff; padding: .5rem 0; z-index: 5; }
+
+#error-message {
+    display: none; color: #b91c1c; background: #fee2e2; border: 1px solid #f87171;
+    padding: .75rem 1rem; border-radius: .5rem; margin-top: 1rem; text-align: center;
+}
+
+.chart-box { position: relative; height: 340px; }
+
+.bar-track { height: .75rem; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; }
+.mode-EC { background: #e76f51; } .mode-OR { background: #457b9d; }
+.mode-CA { background: #7b5ea7; } .mode-EA { background: #2a9d8f; }
+
+@media print {
+    header, footer, button, .view:not(#plan-view) { display: none !important; }
+    #plan-view { display: block !important; box-shadow: none; }
+    body { background: #fff; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

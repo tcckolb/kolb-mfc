@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kolb-MFC</title>
+    <meta name="description" content="Plano de ensino individualizado na preceptoria em Medicina de Família e Comunidade.">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/icon-192.png">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<div id="app" class="max-w-4xl mx-auto p-4 md:p-8">
+
+    <header class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-teal-700">Kolb-MFC</h1>
+        <p class="text-md text-gray-600 mt-2">Plano de Ensino Individualizado na Preceptoria em MFC</p>
+    </header>
+
+    <!-- INÍCIO -->
+    <section id="home-view" class="view active-view bg-white p-6 md:p-8 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Bem-vindo(a)!</h2>
+        <p class="mb-4">Esta ferramenta apoia residentes e preceptores de Medicina de Família e Comunidade (MFC) na construção de uma jornada de aprendizagem mais intencional e personalizada.</p>
+        <p class="mb-4">O residente responde a um questionário de 12 situações baseado no ciclo de aprendizagem experiencial de Kolb. O aplicativo identifica o estilo predominante, sugere estratégias de ensino e feedback e ajuda a criar o Plano de Ensino Individualizado (PEI).</p>
+        <p class="mb-6 text-sm bg-teal-50 text-teal-900 rounded-lg p-3">O resultado mostra uma tendência para orientar a conversa entre preceptor e residente. Não é um rótulo nem um diagnóstico.</p>
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
+            <button type="button" data-go="register-view" class="btn-primary">Novo residente</button>
+            <button type="button" id="saved-btn" class="btn-secondary">Residentes salvos</button>
+            <button type="button" id="example-btn" class="btn-secondary">Ver exemplo</button>
+        </div>
+        <p id="storage-mode" class="text-sm text-gray-500 text-center mt-6"></p>
+    </section>
+
+    <!-- CADASTRO DO RESIDENTE -->
+    <section id="register-view" class="view bg-white p-6 md:p-8 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold mb-2">Dados do residente</h2>
+        <p class="mb-6 text-gray-600">Estes dados ficam salvos junto com o estilo de aprendizagem e o plano de ensino.</p>
+        <form id="register-form" class="grid md:grid-cols-2 gap-4">
+            <label class="field">Nome do residente
+                <input id="student-name" name="student-name" required class="input" placeholder="Ex.: Maria Souza">
+            </label>
+            <label class="field">Ano de residência
+                <select id="student-year" name="student-year" class="input"><option>R1</option><option>R2</option><option>R3</option></select>
+            </label>
+            <label class="field">Preceptor(a)
+                <input id="preceptor-name" name="preceptor-name" class="input" placeholder="Ex.: Dr. João Lima">
+            </label>
+            <label class="field">Unidade de saúde
+                <input id="unit-name" name="unit-name" class="input" placeholder="Ex.: UBS Centro">
+            </label>
+            <div class="md:col-span-2 flex flex-col md:flex-row gap-3 mt-2">
+                <button type="submit" class="btn-primary">Iniciar questionário</button>
+                <button type="button" data-go="home-view" class="btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- QUESTIONÁRIO -->
+    <section id="test-view" class="view bg-white p-6 md:p-8 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold mb-2">Questionário Kolb-MFC</h2>
+        <p class="mb-4 text-gray-600">Em cada situação, classifique as quatro afirmações. Dê <strong>4</strong> para a que mais se parece com você e <strong>1</strong> para a que menos se parece. Cada número é usado uma única vez por situação; ao escolher três, o quarto é marcado sozinho.</p>
+        <div class="sticky-progress">
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden"><div id="progress-bar" class="h-full bg-teal-600 transition-all" style="width:0"></div></div>
+            <p id="progress-text" class="text-sm text-gray-500 mt-1"></p>
+        </div>
+        <form id="kolb-form" novalidate>
+            <div id="questions-container" class="space-y-6 mt-4"></div>
+            <div id="error-message" role="alert"></div>
+            <div class="mt-8 flex flex-col md:flex-row gap-3">
+                <button type="submit" class="btn-primary">Ver meu resultado</button>
+                <button type="button" data-go="home-view" class="btn-secondary">Cancelar</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- RESULTADO -->
+    <section id="results-view" class="view bg-white p-6 md:p-8 rounded-xl shadow-md">
+        <p id="example-flag" class="hidden mb-4 text-sm font-semibold text-orange-700 bg-orange-50 rounded-lg p-2">Exemplo com respostas simuladas</p>
+        <h2 class="text-2xl font-bold mb-1">Resultado de <span id="result-name"></span></h2>
+        <p id="result-saved" class="text-sm text-teal-700 mb-4"></p>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div>
+                <h3 class="text-lg font-semibold">Estilo de aprendizagem predominante</h3>
+                <p id="learning-style-result" class="text-3xl font-bold text-teal-700 mt-1"></p>
+                <p id="style-description" class="text-gray-600 mt-3"></p>
+                <h4 class="font-semibold text-lg mt-6 mb-3">Pontuações (12 a 48)</h4>
+                <ul id="score-bars" class="space-y-3"></ul>
+            </div>
+            <div class="chart-box">
+                <canvas id="kolb-chart" aria-label="Posição do residente nos quadrantes de Kolb"></canvas>
+            </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <h3 class="text-xl font-semibold mb-4">Recomendações pedagógicas</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <h4 class="font-semibold mb-2 text-teal-700">Métodos preferenciais</h4>
+                    <ul id="rec-preferred" class="list-disc list-inside space-y-1"></ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2 text-teal-700">Para completar o ciclo</h4>
+                    <ul id="rec-develop" class="list-disc list-inside space-y-1"></ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2 text-teal-700">Tipo de feedback</h4>
+                    <p id="rec-feedback"></p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8 flex flex-col md:flex-row gap-3 justify-center">
+            <button type="button" id="plan-btn" class="btn-primary">Criar plano de ensino</button>
+            <button type="button" id="retake-btn" class="btn-secondary">Refazer questionário</button>
+            <button type="button" data-go="home-view" class="btn-secondary">Concluir</button>
+        </div>
+    </section>
+
+    <!-- PLANO DE ENSINO -->
+    <section id="plan-view" class="view bg-white p-6 md:p-8 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold mb-1">Plano de Ensino Individualizado (PEI)</h2>
+        <p id="plan-summary" class="text-gray-600 mb-6"></p>
+        <form id="plan-form" class="space-y-4">
+            <div class="grid md:grid-cols-2 gap-4">
+                <label class="field">Data do plano<input type="date" id="plan-date" name="plan-date" class="input" required></label>
+                <label class="field">Data de revisão<input type="date" id="review-date" name="review-date" class="input"></label>
+            </div>
+            <label class="field">Competências priorizadas (Currículo Baseado em Competências da SBMFC)
+                <textarea id="competencies" name="competencies" rows="3" class="input" placeholder="Ex.: abordagem familiar; saúde da mulher; procedimentos ambulatoriais."></textarea>
+            </label>
+            <label class="field">Metas SMART acordadas
+                <textarea id="goals" name="goals" rows="4" class="input" placeholder="Metas específicas, mensuráveis, alcançáveis, relevantes e com prazo."></textarea>
+            </label>
+            <fieldset>
+                <legend class="font-semibold mb-2">Estratégias de ensino escolhidas</legend>
+                <div id="strategies" class="grid md:grid-cols-2 gap-4"></div>
+            </fieldset>
+            <label class="field">Cenários de prática
+                <textarea id="settings" name="settings" rows="2" class="input" placeholder="Consultório, visita domiciliar, grupos, reunião de equipe, procedimentos."></textarea>
+            </label>
+            <label class="field">Acompanhamento e feedback
+                <textarea id="feedback-plan" name="feedback-plan" rows="3" class="input"></textarea>
+            </label>
+            <div class="flex flex-col md:flex-row gap-3 pt-2">
+                <button type="submit" class="btn-primary">Salvar plano</button>
+                <button type="button" id="print-btn" class="btn-secondary">Imprimir ou salvar PDF</button>
+                <button type="button" data-go="results-view" class="btn-secondary">Voltar</button>
+            </div>
+            <p id="plan-msg" class="text-sm text-teal-700" aria-live="polite"></p>
+        </form>
+    </section>
+
+    <!-- RESIDENTES SALVOS -->
+    <section id="saved-view" class="view bg-white p-6 md:p-8 rounded-xl shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Residentes salvos</h2>
+        <ul id="saved-list" class="space-y-3"></ul>
+        <div class="mt-6"><button type="button" data-go="home-view" class="btn-secondary">Início</button></div>
+    </section>
+
+    <footer class="text-center text-sm text-gray-500 mt-8">Kolb-MFC · produto técnico educacional · questionário autoral baseado em Kolb (1984)</footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
