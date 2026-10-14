@@ -2,7 +2,7 @@
 // Caminhos relativos: funciona na raiz do domínio ou em subpastas,
 // como https://usuario.github.io/kolb-mfc/
 // Ao publicar uma nova versão, aumente o número do cache.
-const CACHE_NAME = "kolb-mfc-v4";
+const CACHE_NAME = "kolb-mfc-v5";
 const ARQUIVOS = [
   "./",
   "./index.html",

@@ -10,6 +10,10 @@ Acesse: **https://tcckolb.github.io/kolb-mfc/**
 
 O Kolb-MFC é o produto técnico de um trabalho de conclusão de curso da Especialização em Preceptoria em Medicina de Família e Comunidade. O código é livre, sob a [licença MIT](LICENSE): qualquer pessoa ou programa de residência pode usar, copiar, adaptar e redistribuir, inclusive o questionário e as recomendações, desde que mantenha o aviso de licença. Para adaptar, faça um fork deste repositório e publique a sua versão no GitHub Pages.
 
+## Desenvolvimento com inteligência artificial
+
+O aplicativo foi desenvolvido com o apoio do [Claude](https://claude.ai), assistente de inteligência artificial da Anthropic, na programação, nos testes e na documentação. A concepção pedagógica e a revisão final são do autor do trabalho.
+
 ## Arquivos
 
 ```
